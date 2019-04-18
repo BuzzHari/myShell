@@ -1,14 +1,13 @@
 %{
-#include"myshell.h"
 #include<string.h>
 #include<stdio.h>
+#include"myShell.h"
 int yylex();
 void yyerror(char const *s);
 %}
 
 
 %token NEWLINE WORD
-
 /*Bison basically works by asking flex to get the next token
 , which it returns as an object of type "YYSTYPE". By default,
 YYSTYPE, is just a typedef of "int".
@@ -21,31 +20,37 @@ could return.*/
 }
 
 %type <str> WORD
-
 %%
 command_list:/*empty*/
-            | command_list command_line{
+            |command_list command_line{  
+                printCurrentCommand();
                 printf("myShell > ");
             }
             ;
 
-command_line:
-            cmd_and_args NEWLINE 
-            | NEWLINE
-
-cmd_and_args:
-             WORD arg_list {
-                SIMPLE_COMMAND.insertArguments($1);
-                SIMPLE_COMMAND.printCommand();
-                free($1);
-             }
+command_line: simple_command NEWLINE{
+                //printf("NULL\n");
+                insertArguments((char*)NULL);       
+            }
+            | NEWLINE{
+                //printf("NULL\n");
+                insertArguments((char*)NULL);       
+            }
             ;
 
-arg_list:/*empty*/
-        | arg_list WORD{
-            printf("Args: %s\n", $2);
-        }
-        ;
+simple_command: simple_command words
+              | WORD{
+                //printf("CMD: %s\n", $1);
+                insertArguments($1);
+                free($1);
+              }
+              ;
+
+words: WORD{
+        //printf("Args: %s\n", $1);
+        insertArguments($1);
+        free($1);
+     }
 %%
 
 
