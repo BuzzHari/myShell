@@ -22,7 +22,7 @@ could return.*/
 %type <str> WORD
 %%
 command_list: command_line{  
-                printCurrentCommand();
+                //printCurrentCommand();
                 //EXITS WITH SUCCESS AFTER GOOD PARSE.
                 //The thing is any command will be a good pares.
                 //my lex and grammer is buggy af...lul.
