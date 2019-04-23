@@ -7,7 +7,7 @@ void yyerror(char const *s);
 %}
 
 
-%token NEWLINE WORD
+%token NEWLINE WORD NOTOKEN
 /*Bison basically works by asking flex to get the next token
 , which it returns as an object of type "YYSTYPE". By default,
 YYSTYPE, is just a typedef of "int".
@@ -21,10 +21,12 @@ could return.*/
 
 %type <str> WORD
 %%
-command_list:/*empty*/
-            |command_list command_line{  
+command_list: command_line{  
                 printCurrentCommand();
-                printf("myShell > ");
+                //EXITS WITH SUCCESS AFTER GOOD PARSE.
+                //The thing is any command will be a good pares.
+                //my lex and grammer is buggy af...lul.
+                YYACCEPT;
             }
             ;
 
@@ -56,4 +58,8 @@ words: WORD{
 
 void yyerror(char const *s){
     fprintf(stderr, "%s\n", s);
+}
+
+int yywrap(void){
+    return 1;
 }
