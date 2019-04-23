@@ -11,13 +11,14 @@ struct SimpleCommand{
 
     int bufsize;
 
-}SIMPLE_COMMAND;
+}command;
 
-void initializeSimpleCommand();
+void myShellLoop(void);
+void initializeSimpleCommand(void);
 void insertArguments(char *args);
-void printCurrentCommand();
-    
-
+void printCurrentCommand(void);
+int executeShellCommand(void);
+int execute(void);   
 
 
 
