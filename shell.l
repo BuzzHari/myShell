@@ -26,8 +26,6 @@ extern void my_yy_input(char*, int *, int);
 
 "|"     {return PIPE;}
 
-"@"     {return CTRL;}
-
 [^ \t\n][^ \t\n]* {
     yylval.str = strdup(yytext); 
     return WORD;

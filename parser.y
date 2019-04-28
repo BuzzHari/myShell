@@ -48,12 +48,6 @@ command_line: command NEWLINE{
             | error NEWLINE {
                 yyerrok;
             }
-            | CTRL NEWLINE{
-                printf("Pressed ctrl-c\n");
-                YYABORT;
-                yyerrok;
-                //yyerror($1);
-            }
             ;
 command: simple_command
        | command PIPE{
