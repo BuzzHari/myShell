@@ -310,8 +310,8 @@ int execute(int cmdNumber){
 
     if(pid == 0){
         if(execvp(globalCommand.sCommands[cmdNumber].arguments[0], globalCommand.sCommands[cmdNumber].arguments) == -1){
-            perror("myShell");
-            //exit(EXIT_FAILURE);
+            perror("myShell: Command error");
+            exit(EXIT_FAILURE);
         }
     }
     else if(pid < 0){
