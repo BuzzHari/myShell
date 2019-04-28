@@ -11,10 +11,8 @@
 
 char currentPathName[PATH_MAX];
 gCommand globalCommand; 
-
 /* Function declrations for the in-built commands*/
-int myShell_cd(char **args);
-int myShell_pwd(char **args);
+int myShell_cd(char **args); int myShell_pwd(char **args);
 int myShell_exit(char **args);
 
 /*list of builtin_commands supported by myshell*/
@@ -30,6 +28,7 @@ int (*builtin_cmd_funcs[])(char**) = {
     &myShell_pwd,
     &myShell_exit
 };
+
 
 //for cd.
 int myShell_cd(char **args){
@@ -73,7 +72,7 @@ int myShell_pwd(char **args){
 //exits.. lol
 int myShell_exit(char **args){
     printf("exit\n");
-  return 0;
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -309,6 +308,7 @@ int execute(int cmdNumber){
     pid = fork();
 
     if(pid == 0){
+        signal(SIGINT, SIG_DFL);
         if(execvp(globalCommand.sCommands[cmdNumber].arguments[0], globalCommand.sCommands[cmdNumber].arguments) == -1){
             perror("myShell: Command error");
             exit(EXIT_FAILURE);

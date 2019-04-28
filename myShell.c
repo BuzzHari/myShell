@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include<signal.h>
 #include"parser.tab.h"
 #include"myShell.h"
 
@@ -14,6 +15,9 @@ int main(){
 void myShellLoop(){
     int shellStatus = 1;
     int parserStatus;
+
+    signal(SIGINT, SIG_IGN);
+    
     do{
         //Initialize a new command, to parse and execute.
         initializeGlobalCommand();
@@ -25,7 +29,7 @@ void myShellLoop(){
             shellStatus = executeShellCommand();
         else
             printf("Not a valid shell command\n");
-    }while(shellStatus);
+    }while(1);
 }
 
 
