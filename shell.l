@@ -1,7 +1,7 @@
 %{
 #include<string.h>
 #include<stdio.h>
-#include"parser2.tab.h"    
+#include"parser.tab.h"    
 %}
 
 %option nounput
@@ -15,8 +15,6 @@
 ">"     { return GREAT;}
 
 "<"     {return LESS;}
-
-"&"     {return AMPERSAND;}
 
 "|"     {return PIPE;}
 
