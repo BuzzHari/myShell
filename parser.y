@@ -7,7 +7,12 @@ void yyerror(char const *s);
 %}
 
 
-%token NEWLINE WORD NOTOKEN
+%define parse.error verbose
+
+%token WORD
+%token NEWLINE
+%token IO_NUMBER
+%token GREAT LESS PIPE 
 /*Bison basically works by asking flex to get the next token
 , which it returns as an object of type "YYSTYPE". By default,
 YYSTYPE, is just a typedef of "int".
@@ -20,17 +25,18 @@ could return.*/
 }
 
 %type <str> WORD
+
+%start command_list
 %%
 command_list: command_line{  
                 //printCurrentCommand();
+                //printf("success\n");
                 //EXITS WITH SUCCESS AFTER GOOD PARSE.
-                //The thing is any command will be a good pares.
-                //my lex and grammer is buggy af...lul.
                 YYACCEPT;
             }
             ;
 
-command_line: simple_command NEWLINE{
+command_line: command NEWLINE{
                 //printf("NULL\n");
                 insertArguments((char*)NULL);       
             }
@@ -38,21 +44,57 @@ command_line: simple_command NEWLINE{
                 //printf("NULL\n");
                 insertArguments((char*)NULL);       
             }
+            | error NEWLINE {
+                yyerrok;
+            }
             ;
+command: simple_command
+       | command PIPE{
+            //printf("PIPE\n");
+            insertArguments("PIPE");
+       } simple_command
+       ;
 
-simple_command: simple_command words
-              | WORD{
-                //printf("CMD: %s\n", $1);
-                insertArguments($1);
-                free($1);
-              }
+simple_command: cmd_prefix cmd_word cmd_suffix
+              | cmd_prefix cmd_word
+              | cmd_prefix
+              | cmd_name cmd_suffix
+              | cmd_name
               ;
 
-words: WORD{
-        //printf("Args: %s\n", $1);
-        insertArguments($1);
-        free($1);
-     }
+cmd_name: WORD{
+            //printf("CMD_NAME: %s\n", $1);
+            insertArguments($1);
+            free($1);
+        }
+        ;
+
+cmd_word: WORD{
+            //printf("CMD_WORD: %s\n", $1);
+            insertArguments($1);
+            free($1);
+        }
+        ;
+
+cmd_prefix: cmd_prefix io_file
+          | io_file
+          ;
+
+cmd_suffix: cmd_suffix io_file
+          | io_file
+          | cmd_suffix cmd_word
+          | cmd_word
+          ;
+
+io_file: LESS{
+            //printf("Redirection: <\n");
+            insertArguments("LESS");
+       } cmd_word
+       | GREAT{
+            //printf("Redirectrion: >\n");
+            insertArguments("GREAT");
+       } cmd_word
+       ;
 %%
 
 
@@ -61,5 +103,17 @@ void yyerror(char const *s){
 }
 
 int yywrap(void){
-    return 1;
-}
+    return 1; }
+
+/*int main(){
+    printf("Starting to parse!\n");
+    while(1){
+        if(!yyparse())
+            printf("Success\n");
+        else{
+            printf("FAIL\n");
+            break;
+        }
+    }
+    return 0;
+}*/

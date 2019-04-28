@@ -1,7 +1,7 @@
 %{
 #include<string.h>
 #include<stdio.h>
-#include"parser.tab.h"    
+#include"parser2.tab.h"    
 %}
 
 %option nounput
@@ -9,7 +9,17 @@
 
 %%
 \n      {return NEWLINE;}
+
 [ \t]   {/* Discards spaces and tabs */}
+
+">"     { return GREAT;}
+
+"<"     {return LESS;}
+
+"&"     {return AMPERSAND;}
+
+"|"     {return PIPE;}
+
 [^ \t\n][^ \t\n]* {
     yylval.str = strdup(yytext); // Don't forget to free it!!!
     return WORD;

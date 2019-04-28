@@ -15,9 +15,8 @@ void myShellLoop(){
     int shellStatus = 1;
     int parserStatus;
     do{
-        
         //Initialize a new command, to parse and execute.
-        initializeSimpleCommand();
+        initializeGlobalCommand();
         //scans and parses the command from STDIN, and populates the command structure.
         //returns 0 on success and
         //1 on failure.
