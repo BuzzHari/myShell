@@ -9,16 +9,21 @@
 
 #include"myShell.h"
 
+char *historyFile = "/home/hari/.mhist";
+FILE *fp;
+
+
 char currentPathName[PATH_MAX];
 gCommand globalCommand; 
 /* Function declrations for the in-built commands*/
 int myShell_cd(char **args); int myShell_pwd(char **args);
 int myShell_exit(char **args);
-
+int myShell_history(char **args);
 /*list of builtin_commands supported by myshell*/
 char *builtin_commands[]={
     "cd",
     "pwd",
+    "history",
     "exit"
 };
 
@@ -26,8 +31,21 @@ char *builtin_commands[]={
 int (*builtin_cmd_funcs[])(char**) = {
     &myShell_cd,
     &myShell_pwd,
+    &myShell_history,
     &myShell_exit
 };
+
+int myShell_history(char** args){
+    fp = fopen(historyFile, "r");
+    char *buff = (char*) malloc (sizeof(char)*256);
+
+    while (fgets(buff, sizeof buff, fp)){
+        fputs(buff, stdout);
+    }
+
+    fclose(fp);
+    return 1;
+}
 
 
 //for cd.
@@ -94,6 +112,16 @@ void initializeShell(void){
         perror("myShell");
     chdir("/home/hari");
     getcwd(currentPathName, sizeof(currentPathName));
+
+     //Checking if .myShellHistory is present
+     //if not create
+     fp = fopen(historyFile,"r");
+     if(!fp) 
+         fp = fopen(historyFile, "w");
+     else 
+         fclose(fp);
+
+
 }    
 
 
@@ -135,7 +163,25 @@ void freeGlobalCommand(){
     free(globalCommand.errfile);
 }
 
+int first = 1;
 void insertArguments(char *args){
+
+    //Inserting to historyFile
+
+    fp = fopen(historyFile,"a");
+    if (args){
+        if (!first){
+            fprintf(fp," ");
+        }
+        first = 0;
+        fprintf(fp,"%s", args);
+    }else{
+        first = 1;
+        fprintf(fp, "\n");
+    }
+    fclose(fp);
+    //End of inserting to historyFile
+
       
     /*  If from parser, we get the IO redirection symbols, 
      *  then these flags, are set, so the next token from the 

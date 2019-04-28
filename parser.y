@@ -13,6 +13,7 @@ void yyerror(char const *s);
 %token NEWLINE
 %token IO_NUMBER
 %token GREAT LESS PIPE 
+%token CTRL
 /*Bison basically works by asking flex to get the next token
 , which it returns as an object of type "YYSTYPE". By default,
 YYSTYPE, is just a typedef of "int".
@@ -24,7 +25,7 @@ could return.*/
     char *str;
 }
 
-%type <str> WORD
+%type <str> WORD CTRL
 
 %start command_list
 %%
@@ -46,6 +47,12 @@ command_line: command NEWLINE{
             }
             | error NEWLINE {
                 yyerrok;
+            }
+            | CTRL NEWLINE{
+                printf("Pressed ctrl-c\n");
+                YYABORT;
+                yyerrok;
+                //yyerror($1);
             }
             ;
 command: simple_command
@@ -99,6 +106,7 @@ io_file: LESS{
 
 
 void yyerror(char const *s){
+    printf("in here\n");
     fprintf(stderr, "%s\n", s);
 }
 
