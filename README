@@ -2,6 +2,5 @@ A Linux Shell.
 
 Written in C. Implemented using Flex and Bison.
 
-
-
+It supports builtin commands like cd, pwd, history. Also supports pipelinig and redirection.
 
