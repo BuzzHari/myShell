@@ -169,17 +169,19 @@ void insertArguments(char *args){
     //Inserting to historyFile
 
     fp = fopen(historyFile,"a");
+    if (!fp){
+        fp = fopen(historyFile, "w");
+    }
     if (args){
         if (!first){
             fprintf(fp," ");
         }
         first = 0;
-        fprintf(fp,"%s", args);
     }else{
         first = 1;
         fprintf(fp, "\n");
     }
-    fclose(fp);
+
     //End of inserting to historyFile
 
       
@@ -193,6 +195,7 @@ void insertArguments(char *args){
     
     //If pipe, then increase the number of sCommands by 1, and intialize it.
     if(args != NULL && strcmp(args, "PIPE") == 0){
+        fprintf(fp, "%s", "|");
         globalCommand.numberOfSimpleCommands+=1;
         globalCommand.sCommands = realloc(globalCommand.sCommands, sizeof(sCommand)*(globalCommand.numberOfSimpleCommands+1));
         
@@ -203,17 +206,22 @@ void insertArguments(char *args){
     //if LESS, that means redirect the input from the file given,
     //this sets the flag INPUTREDIR_FLAG, so the next token can
     //get stored in globalCommand.infile.
-    else if(args != NULL && strcmp(args, "LESS") == 0)
+    else if(args != NULL && strcmp(args, "LESS") == 0){
         INPUTREDIR_FLAG = 1;
+        fprintf(fp, "%s", "<");
+    }
     //if GREAT, that means redirect the output from the file given,
     //this sets the flag OUTPUTREDIR_FLAG, so the next token can
     //get stored in globalCommand.outfile.
-    else if(args != NULL && strcmp(args, "GREAT") == 0)
+    else if(args != NULL && strcmp(args, "GREAT") == 0){
         OUTPUTREDIR_FLAG = 1;
+        fprintf(fp, "%s", ">");
+    }
     //the token is part of the command, and stores it in gloabalCommands.sCommnads[].arguments.
     else{ 
         int noOfSCmd=globalCommand.numberOfSimpleCommands;
         if(args != NULL){
+            fprintf(fp, "%s", args);
             if(INPUTREDIR_FLAG){
                 //storing the input file
                 globalCommand.infile = strdup(args);
@@ -240,6 +248,7 @@ void insertArguments(char *args){
             globalCommand.sCommands[noOfSCmd].arguments[(globalCommand.sCommands[noOfSCmd].numberOfArguments)++] = NULL;
         }
     }
+    fclose(fp);
 }
 
 void printCurrentCommand(){
@@ -325,12 +334,12 @@ int executeShellCommand(void){
         close(fdout);
         
         int BUILTIN_FLAG = 0;
-        printf("command:%s\n", globalCommand.sCommands[i].arguments[0]);
+        //printf("command:%s\n", globalCommand.sCommands[i].arguments[0]);
         for(int j = 0; j < builtinLen; j++){
             if(globalCommand.sCommands[i].arguments[0] != NULL &&strcmp(globalCommand.sCommands[i].arguments[0], builtin_commands[j]) == 0){
                 BUILTIN_FLAG = 1;
                 status = (*builtin_cmd_funcs[j])(globalCommand.sCommands[i].arguments);
-                printf("status: %d\n", status);
+                //printf("status: %d\n", status);
             }
         }
         if(!BUILTIN_FLAG)
@@ -339,7 +348,7 @@ int executeShellCommand(void){
     }
 
     dup2(tmpin,0);
-    dup2(tmpin,1);
+    dup2(tmpout,1);
     close(tmpin);
     close(tmpout);
     freeGlobalCommand();
