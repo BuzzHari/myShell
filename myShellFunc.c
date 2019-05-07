@@ -9,7 +9,7 @@
 
 #include"myShell.h"
 
-char *historyFile = "/home/hari/.mhist";
+char *historyFile = NULL;
 FILE *fp;
 
 
@@ -104,17 +104,21 @@ void initializeShell(void){
      * atm it just initializes the command structure.
      * and sets up some env vars.
      */
-    if(setenv("HOME", "/home/hari", 1) != 0)
+    char *USER_PATH = getenv("HOME");
+    if(setenv("HOME", USER_PATH, 1) != 0)
         perror("myShell");
-    if(setenv("PWD", "/home/hari", 1) != 0)
+    if(setenv("PWD", USER_PATH, 1) != 0)
         perror("myShell");
-    if(setenv("OLDPWD", "/home/hari", 1) != 0)
+    if(setenv("OLDPWD", USER_PATH, 1) != 0)
         perror("myShell");
-    chdir("/home/hari");
+    chdir(USER_PATH);
     getcwd(currentPathName, sizeof(currentPathName));
 
      //Checking if .myShellHistory is present
      //if not create
+     char *fileName = "/.mhist";
+     historyFile = (char *) malloc(sizeof(char)*PATH_MAX);
+     historyFile = strcat(USER_PATH,fileName);
      fp = fopen(historyFile,"r");
      if(!fp) 
          fp = fopen(historyFile, "w");
