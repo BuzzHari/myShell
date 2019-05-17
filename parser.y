@@ -12,7 +12,7 @@ void yyerror(char const *s);
 %token WORD
 %token NEWLINE
 %token IO_NUMBER
-%token GREAT LESS PIPE 
+%token GREAT LESS PIPE AMPERSAND 
 /*Bison basically works by asking flex to get the next token
 , which it returns as an object of type "YYSTYPE". By default,
 YYSTYPE, is just a typedef of "int".
@@ -37,6 +37,9 @@ command_list: command_line{
             ;
 command_line: command NEWLINE{ //printf("NULL\n");
                 insertArguments((char*)NULL);       
+            }
+            | command AMPERSAND NEWLINE{
+                insertArguments("AMPERSAND"); 
             }
             | NEWLINE{
                 //printf("NULL\n");

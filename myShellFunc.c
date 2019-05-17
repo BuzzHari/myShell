@@ -221,6 +221,11 @@ void insertArguments(char *args){
         OUTPUTREDIR_FLAG = 1;
         fprintf(fp, "%s", ">");
     }
+    //If AMPERSAND, that means run the command in the background
+    //i.e, don't wait for the child process to end.
+    else if(args != NULL && strcmp(args,"AMPERSAND") == 0){
+         globalCommand.background = 1;
+    }
     //the token is part of the command, and stores it in gloabalCommands.sCommnads[].arguments.
     else{ 
         int noOfSCmd=globalCommand.numberOfSimpleCommands;
@@ -256,7 +261,8 @@ void insertArguments(char *args){
 }
 
 void printCurrentCommand(){
-    for(int i=0; i<=globalCommand.numberOfSimpleCommands; i++){
+    for(int i=0; 
+            i<=globalCommand.numberOfSimpleCommands; i++){
         printf("Command %d:\n", i+1);
         for(int j=0; globalCommand.sCommands[i].arguments[j] != NULL; j++)
             printf("%s ", globalCommand.sCommands[i].arguments[j]);
@@ -361,7 +367,7 @@ int executeShellCommand(void){
 
 
 int execute(int cmdNumber){
-    pid_t pid;
+    pid_t pid, wpid;
     int status;
 
     pid = fork();
@@ -378,20 +384,27 @@ int execute(int cmdNumber){
         perror("myShell");
     }
     else{
+        
+        if(!globalCommand.background){
             do{
                 /* pid: If > 0, then waits for the child with process id value equal to pid.
                  * WUNTRACED: also return if a child has stopped 
                  * status: the integer is returned by waitpid,
                  *        and can be inspected my macros like WIFEXITED, WIFSIGNALED, etc.
                  */ 
-                waitpid(pid, &status, WUNTRACED);
-
+                wpid = waitpid(pid, &status, WUNTRACED);
+                //waitpid(-1, &status, WNOHANG);
+                //printf("wpid %d\n", wpid);
                /* 
                 * WIFEXITED: returns true fi the child terminated normally.
                 * WIFSIGNALED: returns true if the chidl process was teminated by a signal.
                 *
                 */ 
-            }while(!WIFEXITED(status) && !WIFSIGNALED(status) && !globalCommand.background);
+            }while(!WIFEXITED(status) && !WIFSIGNALED(status));
+        }
+        else{
+            printf("[%d] started\n", pid);
+        }
     }
     return 1;
 }
