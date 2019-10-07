@@ -1,3 +1,5 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/buzzhari/myshell/badge)](https://www.codefactor.io/repository/github/buzzhari/myshell)
+
 # A Linux Shell. 
 
 Written in C. Implemented using Flex and Bison.
